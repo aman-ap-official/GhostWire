@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostWire | Secure P2P Encrypted Communication</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Google Fonts: Orbitron for titles, Rajdhani for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a0a1a;
+            --neon-cyan: #00e5ff;
+            --neon-green: #00ff88;
+            --electric-purple: #D83CF0;
+            --text-light: #e0e0e0;
+            --text-muted: #94a3b8;
+            --card-bg-alpha: rgba(10, 15, 25, 0.7);
+            --border-alpha: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Rajdhani', sans-serif;
+            height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Hero Section --- */
+        .hero-section {
+            background-color: var(--bg-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 150vw; /* Larger than viewport */
+            height: 150vh;
+            top: -25vh;
+            left: -25vw;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--neon-cyan) 0%, transparent 30%),
+                radial-gradient(circle at 75% 75%, var(--electric-purple) 0%, transparent 30%),
+                radial-gradient(circle at 50% 0%, var(--neon-green) 0%, transparent 25%);
+            filter: blur(150px);
+            animation: moveBlobs 25s infinite alternate ease-in-out;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        @keyframes moveBlobs {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20vw, -10vh) scale(1.1); }
+            66% { transform: translate(-15vw, 15vh) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .hero-section h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.6));
+        }
+
+        .hero-section p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* --- Action Panel (Glassmorphism) --- */
+        .action-panel {
+            max-width: 450px;
+            background: var(--card-bg-alpha);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-alpha);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 229, 255, 0.05);
+        }
+
+        .action-panel input.form-control-lg {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .action-panel input.form-control-lg::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .action-panel input.form-control-lg:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2), 0 0 5px var(--neon-cyan);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-light);
+        }
+
+        /* --- Custom Neon Buttons --- */
+        .btn-primary-neon, .btn-secondary-neon {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease; /* GSAP will override this for hover */
+        }
+
+        /* --- Inputs & Buttons --- */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .btn-primary-neon {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+        }
+
+        .btn-secondary-neon {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        /* --- Features Section --- */
+        .features-section {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(10, 10, 26, 0.9) 100%);
+        }
+
+        .features-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(to right, var(--electric-purple), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(216, 60, 240, 0.4));
+        }
+
+        .feature-card {
+            background: var(--card-bg-alpha);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-alpha);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 229, 255, 0.05);
+            transition: all 0.3s ease; /* GSAP will override for hover */
+        }
+
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+        }
+
+        .feature-card .feature-icon {
+            font-size: 3rem;
+            color: var(--neon-green);
+            filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
+        }
+
+        /* --- Footer --- */
+        .footer-section {
+            background-color: #050510;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .hero-section h1 { font-size: 2.5rem; letter-spacing: 4px; }
+            .hero-section p { font-size: 1rem; }
+            .action-panel { padding: 30px 20px; max-width: 90%; }
+            .features-section h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <!-- Hero Section -->
+        <header class="hero-section d-flex align-items-center justify-content-center text-center min-vh-100 position-relative py-5">
+            <div class="hero-bg-animation"></div>
+            <div class="container position-relative z-1">
+                <h1 class="display-1 fw-bold mb-3 text-uppercase" id="heroTitle">GhostWire</h1>
+                <p class="lead mb-5" id="heroSubtitle">Secure peer-to-peer encrypted communication in your browser</p>
+                
+                <!-- Action Panel -->
+                <div class="action-panel mx-auto p-4 p-md-5 rounded-4 shadow-lg" id="actionPanel">
+                    <div class="input-group mb-3">
+                        <input type="text" id="roomIdInput" class="form-control form-control-lg text-center" placeholder="ENTER ROOM ID" autocomplete="off">
+                    </div>
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-lg btn-primary-neon" onclick="joinRoom()">Join Room</button>
+                        <button class="btn btn-lg btn-secondary-neon" onclick="createRoom()">Create New Room</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Features Section -->
+        <section class="features-section py-5">
+            <div class="container py-5">
+                <h2 class="text-center display-5 fw-bold mb-5 text-uppercase" id="featuresTitle">Why GhostWire?</h2>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col" id="featureCard1">
+                        <div class="feature-card p-4 rounded-4 h-100 text-center">
+                            <i class="bi bi-lock-fill feature-icon mb-3"></i>
+                            <h3 class="h5 fw-bold mb-3">End-to-End Encryption</h3>
+                            <p class="text-light">Your conversations are secured with AES-GCM, ensuring only you and your recipient can read them.</p>
+                        </div>
+                    </div>
+                    <div class="col" id="featureCard2">
+                        <div class="feature-card p-4 rounded-4 h-100 text-center">
+                            <i class="bi bi-lightning-charge-fill feature-icon mb-3"></i>
+                            <h3 class="h5 fw-bold mb-3">Real-time WebRTC</h3>
+                            <p class="text-light">Direct peer-to-peer connections for instant, low-latency communication without intermediaries.</p>
+                        </div>
+                    </div>
+                    <div class="col" id="featureCard3">
+                        <div class="feature-card p-4 rounded-4 h-100 text-center">
+                            <i class="bi bi-server feature-icon mb-3"></i>
+                            <h3 class="h5 fw-bold mb-3">Zero Server Storage</h3>
+                            <p class="text-light">No logs, no message history stored on any server. Your data stays with you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-section py-4 text-center">
+            <p class="mb-0 text-light small">GhostWire &copy; 2026 | Privacy-focused. No data stored.</p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS CDN (Popper included) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        /**
+         * Generates a secure random room ID
+         */
+        function generateRoomId(length = 10) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        /**
+         * Redirects to the room page with the generated ID
+         */
+        function createRoom() {
+            const newId = generateRoomId();
+            window.location.href = `frontend/room.html?room=${newId}`;
+        }
+
+        /**
+         * Validates the input and joins an existing room
+         */
+        function joinRoom() {
+            const input = document.getElementById('roomIdInput').value.trim();
+            if (input) {
+                window.location.href = `frontend/room.html?room=${encodeURIComponent(input)}`;
+            } else {
+                // Subtle shake effect or alert for empty input
+                gsap.to("#roomIdInput", {
+                    x: -10,
+                    duration: 0.1,
+                    repeat: 3,
+                    yoyo: true,
+                    ease: "power1.inOut",
+                    onComplete: () => gsap.to("#roomIdInput", { x: 0, duration: 0.1 })
+                });
+                gsap.to("#roomIdInput", {
+                    borderColor: '#ff4444',
+                    boxShadow: '0 0 15px rgba(255, 68, 68, 0.5)',
+                    duration: 0.2,
+                    onComplete: () => gsap.to("#roomIdInput", {
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        boxShadow: 'none',
+                        duration: 0.5
+                    })
+                });
+            }
+        }
+
+        // Allow "Enter" key to trigger Join Room
+        document.getElementById('roomIdInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent default form submission if any
+                joinRoom();
+            }
+        });
+
+        // GSAP On-Load Animations
+        document.addEventListener("DOMContentLoaded", function() {
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            tl.from("#heroTitle", { opacity: 0, y: 50, duration: 1.2, delay: 0.5 })
+              .from("#heroSubtitle", { opacity: 0, y: 30, duration: 1, delay: -0.8 }, "<0.3")
+              .from("#actionPanel", { opacity: 0, y: 50, duration: 1, delay: -0.6 }, "<0.3");
+
+            // GSAP for button hover effects
+            document.querySelectorAll('.btn-primary-neon, .btn-secondary-neon').forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    gsap.to(button, {
+                        scale: 1.05,
+                        boxShadow: button.classList.contains('btn-primary-neon') ? '0 0 30px rgba(0, 229, 255, 0.8)' : '0 0 30px rgba(0, 255, 136, 0.8)',
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                button.addEventListener('mouseleave', () => {
+                    gsap.to(button, {
+                        scale: 1,
+                        boxShadow: 'none',
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+            // GSAP for Features Section animations
+            gsap.from("#featuresTitle", {
+                opacity: 0, y: 50, duration: 1, ease: "power3.out",
+                scrollTrigger: { trigger: "#featuresTitle", start: "top 85%" }
+            });
+            gsap.from(".feature-card", {
+                opacity: 0, y: 50, duration: 0.8, ease: "power3.out", 
+                scrollTrigger: { trigger: ".features-section", start: "top 75%" }
+            });
+        });
+    </script>
+</body>
+</html>

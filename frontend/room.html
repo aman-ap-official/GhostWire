@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostWire | Secure Room</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --bg-dark: #050510;
+            --panel-bg: rgba(13, 17, 28, 0.8);
+            --neon-cyan: #00e5ff;
+            --neon-green: #00ff88;
+            --border-glow: rgba(0, 229, 255, 0.2);
+            --text-main: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Custom Utility */
+        .text-main { color: var(--text-main); }
+        .bg-cyber-dark { background-color: var(--bg-dark); }
+
+        /* --- Header / Nav --- */
+        .room-header {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 0.75rem 1.5rem;
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+        }
+
+        .room-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        /* --- Main Layout --- */
+        .room-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1px;
+            overflow: hidden; /* Constrain grid to flex parent */
+            background: var(--border-glow);
+        }
+
+        /* --- Control Sidebar --- */
+        .sidebar {
+            background: var(--bg-dark);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-box {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 229, 255, 0.3); /* Increased visibility with neon cyan */
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .crypto-log {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            height: 150px;
+            overflow-y: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* --- Custom Scrollbar --- */
+        #chatFlow::-webkit-scrollbar {
+            width: 5px;
+        }
+        #chatFlow::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        #chatFlow::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* --- Communication Hub --- */
+        .comm-hub {
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden; /* Force children to respect container height */
+            min-height: 0; /* Prevents container from expanding beyond grid/flex height */
+        }
+
+        #chatFlow {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 0.75rem 1.25rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            position: relative;
+            animation: msgSlide 0.3s ease-out;
+        }
+
+        .msg-sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0.05));
+            border: 1px solid var(--neon-cyan);
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-received {
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(216, 60, 240, 0.1), rgba(216, 60, 240, 0.05));
+            border: 1px solid var(--electric-purple);
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-meta {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* --- Input Area --- */
+        .input-area {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid var(--border-glow);
+        }
+
+        .cyber-input-group {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 229, 255, 0.3); /* Increased visibility with neon cyan */
+        }
+
+        .cyber-input-group input {
+            background: transparent;
+            border: none;
+            color: white;
+            flex: 1;
+            padding: 0.5rem 1rem;
+        }
+
+        .cyber-input-group input:focus { outline: none; }
+
+        @keyframes msgSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .room-container { grid-template-columns: 1fr; }
+            .sidebar { 
+                position: fixed;
+                top: 57px; 
+                left: 0;
+                bottom: 0;
+                z-index: 1050;
+                width: 280px;
+                transform: translateX(-100%);
+                border-right: 1px solid var(--neon-cyan);
+                box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            #chatFlow { padding: 1rem; }
+            .msg-bubble { max-width: 85%; }
+            .room-title { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="room-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <button class="btn btn-outline-info border-0 me-2 d-md-none" onclick="toggleSidebar()" title="Room Info">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            <div class="room-title">GHOSTWIRE // ROOM</div>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success">
+                <i class="bi bi-shield-lock-fill me-1"></i> E2EE ACTIVE
+            </span>
+            <button class="btn btn-sm btn-outline-danger border-0" onclick="window.location.href='../index.html'">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="room-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="stat-box">
+                <span class="stat-label">Connection ID</span>
+                <div id="roomIdDisplay" class="h5 mb-0 text-white font-monospace">--------</div>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-label">Security Protocol</span>
+                <div class="small text-main">Cipher: <span class="text-white">AES-GCM-256</span></div>
+                <div class="small text-main">Exchange: <span class="text-white">ECDH P-384</span></div>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-label">Tactical Comms</span>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-sm btn-outline-info w-100 rounded-3" onclick="startCall('video')">
+                        <i class="bi bi-camera-video-fill me-2"></i> VIDEO LINK
+                    </button>
+                    <button class="btn btn-sm btn-outline-success w-100 rounded-3" onclick="startCall('voice')">
+                        <i class="bi bi-mic-fill me-2"></i> VOICE CHANNEL
+                    </button>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-label">Handshake Status</span>
+                <div id="handshakeLog" class="crypto-log">
+                    [SYSTEM] Awaiting P2P Signal...<br>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <button class="btn btn-sm btn-outline-info w-100 rounded-3" onclick="copyInvite()">
+                    <i class="bi bi-share me-2"></i> Copy Invite Link
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Comm Hub -->
+        <main class="comm-hub">
+            <div id="chatFlow">
+                <!-- Initial System Message -->
+                <div class="text-center my-4">
+                    <span class="badge bg-dark border border-secondary text-main px-3 py-2">
+                        <i class="bi bi-broadcast me-2 "></i> P2P Channel Initialized. Type to communicate.
+                    </span>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="cyber-input-group">
+                    <input type="text" id="messageInput" placeholder="Enter encrypted transmission..." autocomplete="off">
+                    <button class="btn btn-info rounded-3 px-4" onclick="sendMessage()">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('room') || 'GHOST-ALPHA';
+        document.getElementById('roomIdDisplay').textContent = roomId.toUpperCase();
+
+        function addLog(text) {
+            const log = document.getElementById('handshakeLog');
+            log.innerHTML += `> ${text}<br>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function appendMessage(text, type) {
+            const chat = document.getElementById('chatFlow');
+            const div = document.createElement('div');
+            div.className = `msg-bubble ${type === 'sent' ? 'msg-sent' : 'msg-received'}`;
+            div.innerHTML = `
+                <div class="text-content">${text}</div>
+                <span class="msg-meta">${new Date().toLocaleTimeString()} // AES-GCM</span>
+            `;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (!input.value.trim()) return;
+            
+            appendMessage(input.value, 'sent');
+            input.value = '';
+            
+            // Mock peer response
+            setTimeout(() => {
+                addLog('DATA_RECV: Packet verified.');
+                appendMessage('Transmission acknowledged. Channel remains secure.', 'received');
+            }, 1200);
+        }
+
+        function copyInvite() {
+            navigator.clipboard.writeText(window.location.href);
+            addLog('SHARE: Invite link copied.');
+        }
+
+        function startCall(type) {
+            window.location.href = `call.html?room=${roomId}&type=${type}`;
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            addLog('SYSTEM: Tactical interface toggled.');
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') sendMessage();
+        });
+
+        // Initial Handshake Sequence Mock
+        setTimeout(() => addLog('STUN: Server reached.'), 500);
+        setTimeout(() => addLog('ICE: Candidate generated.'), 1000);
+        setTimeout(() => addLog('KEY: Generating ECDH...'), 1500);
+    </script>
+</body>
+</html>
