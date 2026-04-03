@@ -2,357 +2,627 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GhostWire | Secure Room</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>GhostWire | Encrypted Nexus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #050510;
-            --panel-bg: rgba(13, 17, 28, 0.8);
-            --neon-cyan: #00e5ff;
-            --neon-green: #00ff88;
-            --border-glow: rgba(0, 229, 255, 0.2);
-            --text-main: #e2e8f0;
+        * {
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* GLOBAL FONT SIZE INCREASE */
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Rajdhani', sans-serif;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
+            background: #03030c;
+            font-family: 'Inter', sans-serif;
+            font-size: 1px;   /* base increase */
             overflow: hidden;
+            position: relative;
         }
 
-        /* Custom Utility */
-        .text-main { color: var(--text-main); }
-        .bg-cyber-dark { background-color: var(--bg-dark); }
-
-        /* --- Header / Nav --- */
-        .room-header {
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid var(--border-glow);
-            padding: 0.75rem 1.5rem;
-            backdrop-filter: blur(10px);
-            z-index: 1100;
+        /* make all text slightly larger while keeping responsive */
+        .text-xs {
+            font-size: 0.8rem !important;
+        }
+        .text-sm {
+            font-size: 0.7rem !important;
+        }
+        .text-base {
+            font-size: 1rem !important;
+        }
+        
+        /* Animated cyber-grid background */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(#0ff1 1px, transparent 1px),
+                linear-gradient(90deg, #0ff1 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            opacity: 0.3;
+            animation: gridShift 20s linear infinite;
         }
 
-        .room-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        @keyframes gridShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
         }
 
-        /* --- Main Layout --- */
-        .room-container {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 1px;
-            overflow: hidden; /* Constrain grid to flex parent */
-            background: var(--border-glow);
+        .cyber-glow {
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle at 30% 40%, rgba(0, 180, 255, 0.08), transparent 70%);
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* --- Control Sidebar --- */
-        .sidebar {
-            background: var(--bg-dark);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Glassmorphic refined */
+        .glass-panel {
+            background: rgba(8, 12, 25, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 230, 250, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .stat-box {
-            background: var(--panel-bg);
-            border: 1px solid rgba(0, 229, 255, 0.3); /* Increased visibility with neon cyan */
-            border-radius: 12px;
-            padding: 1rem;
+        /* Chat scroll custom */
+        #chat-box::-webkit-scrollbar {
+            width: 5px;
+        }
+        #chat-box::-webkit-scrollbar-track {
+            background: #0f1422;
+            border-radius: 10px;
+        }
+        #chat-box::-webkit-scrollbar-thumb {
+            background: #0ff;
+            border-radius: 10px;
+            box-shadow: 0 0 6px #0ff;
         }
 
-        .stat-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--neon-cyan);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: block;
+        #log-box::-webkit-scrollbar {
+            width: 4px;
         }
-
-        .crypto-log {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7rem;
-            color: var(--neon-green);
-            height: 150px;
-            overflow-y: hidden;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 8px;
+        #log-box::-webkit-scrollbar-thumb {
+            background: #2dd4bf66;
             border-radius: 6px;
         }
 
-        /* --- Custom Scrollbar --- */
-        #chatFlow::-webkit-scrollbar {
-            width: 5px;
+        /* MESSAGE BUBBLES — LIGHT TEXT & LARGER FONT */
+        .bubble-tech-self {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(0, 150, 210, 0.12));
+            border: 1px solid rgba(0, 230, 250, 0.6);
+            border-radius: 24px 24px 6px 24px;
+            box-shadow: 0 6px 14px rgba(0, 200, 255, 0.15);
+            backdrop-filter: blur(4px);
+            color: #f0f9ff !important;
         }
-        #chatFlow::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        #chatFlow::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        /* --- Communication Hub --- */
-        .comm-hub {
-            background: var(--bg-dark);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden; /* Force children to respect container height */
-            min-height: 0; /* Prevents container from expanding beyond grid/flex height */
+        
+        .bubble-tech-peer {
+            background: rgba(20, 28, 45, 0.9);
+            border: 1px solid rgba(100, 150, 255, 0.4);
+            border-radius: 24px 24px 24px 6px;
+            backdrop-filter: blur(4px);
+            color: #f0f9ff !important;
         }
 
-        #chatFlow {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        /* force bright text inside all message bubbles */
+        .bubble-tech-self div, .bubble-tech-peer div {
+            color: #f1f5f9 !important;
+        }
+        .bubble-tech-self .text-cyan-400, .bubble-tech-peer .text-cyan-400 {
+            color: #7dd3fc !important;
         }
 
-        .msg-bubble {
-            max-width: 75%;
-            padding: 0.75rem 1.25rem;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            position: relative;
-            animation: msgSlide 0.3s ease-out;
-        }
-
-        .msg-sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0.05));
-            border: 1px solid var(--neon-cyan);
-            border-bottom-right-radius: 4px;
-        }
-
-        .msg-received {
-            align-self: flex-start;
-            background: linear-gradient(135deg, rgba(216, 60, 240, 0.1), rgba(216, 60, 240, 0.05));
-            border: 1px solid var(--electric-purple);
-            border-bottom-left-radius: 4px;
-        }
-
-        .msg-meta {
-            font-size: 0.8rem;
-            opacity: 0.6;
-            margin-top: 4px;
-            display: block;
-            text-transform: uppercase;
-        }
-
-        /* --- Input Area --- */
-        .input-area {
-            padding: 1.5rem;
+        /* system message style — also bright */
+        .system-message {
             background: rgba(0, 0, 0, 0.5);
-            border-top: 1px solid var(--border-glow);
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            font-family: 'Space Mono', monospace;
+            color: #cbd5e6 !important;
+            border: 1px solid rgba(0, 255, 255, 0.2);
         }
 
-        .cyber-input-group {
-            display: flex;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px;
-            border-radius: 14px;
-            border: 1px solid rgba(0, 229, 255, 0.3); /* Increased visibility with neon cyan */
+        /* log line — increased size */
+        .log-line {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            border-left: 2px solid #0ff;
+            padding-left: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            opacity: 0.9;
         }
 
-        .cyber-input-group input {
-            background: transparent;
-            border: none;
-            color: white;
-            flex: 1;
-            padding: 0.5rem 1rem;
+        /* neon input larger */
+        .neon-input {
+            background: rgba(5, 10, 25, 0.8);
+            border: 1px solid #1e3a5f;
+            transition: all 0.25s ease;
+            font-size: 1rem;
+            padding: 0.85rem 1rem;
+        }
+        .neon-input:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 14px rgba(0, 255, 255, 0.3);
+            outline: none;
+            background: rgba(2, 6, 20, 0.95);
         }
 
-        .cyber-input-group input:focus { outline: none; }
-
-        @keyframes msgSlide {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* send button glowing & larger */
+        .btn-glow-enabled {
+            background: linear-gradient(90deg, #0cf, #0a9);
+            box-shadow: 0 0 16px #0cf8;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            padding: 0.85rem 1.8rem;
+        }
+        .btn-glow-enabled:active {
+            transform: scale(0.96);
         }
 
-        @media (max-width: 768px) {
-            .room-container { grid-template-columns: 1fr; }
-            .sidebar { 
-                position: fixed;
-                top: 57px; 
-                left: 0;
-                bottom: 0;
-                z-index: 1050;
-                width: 280px;
-                transform: translateX(-100%);
-                border-right: 1px solid var(--neon-cyan);
-                box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+        /* Sidebar toggle improvements */
+        @media (max-width: 1023px) {
+            .console-closed {
+                height: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                border-bottom-width: 0 !important;
+                overflow: hidden;
+                opacity: 0;
+                transition: height 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.2s;
             }
-            .sidebar.active {
-                transform: translateX(0);
+            .console-open {
+                height: 220px !important;
+                opacity: 1;
+                border-bottom-width: 1px !important;
+                transition: height 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s;
             }
-            #chatFlow { padding: 1rem; }
-            .msg-bubble { max-width: 85%; }
-            .room-title { font-size: 1rem; }
+            #sidebar {
+                transition: height 0.3s ease, opacity 0.2s;
+            }
+        }
+
+        /* HIGHLIGHTED INVITE URL — vibrant glow */
+        .url-pill {
+            background: linear-gradient(135deg, #0a2a3a, #02121f);
+            backdrop-filter: blur(12px);
+            transition: all 0.2s;
+            border: 1px solid #0ff;
+            box-shadow: 0 0 12px #0ff6;
+            color: #b8f2ff !important;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.9rem;
+            letter-spacing: 0.3px;
+        }
+        .url-pill:active {
+            transform: scale(0.97);
+        }
+        /* make the invite url container bigger and more readable */
+        #invite-url {
+            font-size: 0.85rem;
+            background: #0a1e2acc;
+            border-radius: 40px;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            text-shadow: 0 0 3px cyan;
+        }
+
+        /* status badge larger */
+        .status-badge {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            font-size: 0.75rem;
+            padding: 0.4rem 1rem;
+        }
+
+        /* chat message text size boost */
+        #chat-box .message-bubble div {
+            font-size: 1rem !important;
+            line-height: 1.45 !important;
+        }
+        #chat-box .message-bubble .text-\[9px\] {
+            font-size: 0.75rem !important;
+        }
+
+        /* increase chat container padding for readability */
+        #chat-box {
+            padding: 1.5rem 1.2rem !important;
+        }
+
+        /* overall room header text bigger */
+        h1 {
+            font-size: 1.6rem !important;
+        }
+        .tracking-widest {
+            letter-spacing: 0.15em;
+        }
+
+        /* input placeholder bigger */
+        #message-input::placeholder {
+            font-size: 0.9rem;
+        }
+
+        /* Make console log text brighter and easier */
+        .log-line span {
+            color: #9cdbff !important;
         }
     </style>
 </head>
-<body>
+<body class="h-screen flex flex-col">
 
-    <header class="room-header d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <button class="btn btn-outline-info border-0 me-2 d-md-none" onclick="toggleSidebar()" title="Room Info">
-                <i class="bi bi-info-circle"></i>
+    <div class="cyber-grid"></div>
+    <div class="cyber-glow"></div>
+
+    <header class="relative z-20 flex justify-between items-center px-5 py-3 md:px-7 md:py-4 border-b border-cyan-500/20 bg-black/40 backdrop-blur-xl shadow-md">
+        <div class="flex items-center gap-4">
+            <button id="toggle-console" class="lg:hidden p-2 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 active:scale-95 transition-all shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
             </button>
-            <div class="room-title">GHOSTWIRE // ROOM</div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent" style="font-family: 'Inter', sans-serif;">GHOSTWIRE</h1>
+                <div id="room-display" class="text-xs md:text-sm text-slate-300 font-mono flex items-center gap-3 mt-1">
+                    <span id="invite-url" class="url-pill px-3 py-1 rounded-full border-2 border-cyan-400 text-cyan-100 cursor-pointer transition-all truncate max-w-[180px] sm:max-w-[320px] text-sm font-mono font-bold shadow-cyan-500/50 shadow-sm">loading...</span>
+                    <span class="hidden md:inline-block text-cyan-400/80 text-[16px] font-mono">⟡ encrypted room</span>
+                </div>
+            </div>
         </div>
-        <div class="d-flex gap-3 align-items-center">
-            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success">
-                <i class="bi bi-shield-lock-fill me-1"></i> E2EE ACTIVE
+        <div id="status" class="status-badge text-[11px] md:text-sm font-bold uppercase tracking-wider text-red-300 flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/40 bg-red-950/30 shadow-md">
+            <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
             </span>
-            <button class="btn btn-sm btn-outline-danger border-0" onclick="window.location.href='../index.html'">
-                <i class="bi bi-x-lg"></i>
-            </button>
+            <span class="hidden sm:inline">DISCONNECTED</span><span class="sm:hidden">OFF</span>
         </div>
     </header>
 
-    <div class="room-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="stat-box">
-                <span class="stat-label">Connection ID</span>
-                <div id="roomIdDisplay" class="h5 mb-0 text-white font-monospace">--------</div>
+    <main class="flex flex-col lg:flex-row flex-1 w-full overflow-hidden relative">
+        <!-- Sidebar Console (cyber logs) -->
+        <aside id="sidebar" class="w-full lg:w-80 h-0 lg:h-full border-b lg:border-b-0 lg:border-r border-cyan-500/15 glass-panel flex flex-col overflow-hidden z-10 transition-all duration-300 console-closed shrink-0">
+            <div class="p-3 border-b border-cyan-500/20 bg-black/30 flex justify-between items-center">
+                <h2 class="text-sm font-bold text-cyan-400 tracking-[0.3em] uppercase flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span> 
+                    SYSLOG
+                </h2>
+                <span class="text-[15px] text-cyan-600/70 font-mono">v.2.4.0</span>
             </div>
-
-            <div class="stat-box">
-                <span class="stat-label">Security Protocol</span>
-                <div class="small text-main">Cipher: <span class="text-white">AES-GCM-256</span></div>
-                <div class="small text-main">Exchange: <span class="text-white">ECDH P-384</span></div>
-            </div>
-
-            <div class="stat-box">
-                <span class="stat-label">Tactical Comms</span>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-sm btn-outline-info w-100 rounded-3" onclick="startCall('video')">
-                        <i class="bi bi-camera-video-fill me-2"></i> VIDEO LINK
-                    </button>
-                    <button class="btn btn-sm btn-outline-success w-100 rounded-3" onclick="startCall('voice')">
-                        <i class="bi bi-mic-fill me-2"></i> VOICE CHANNEL
-                    </button>
-                </div>
-            </div>
-
-            <div class="stat-box">
-                <span class="stat-label">Handshake Status</span>
-                <div id="handshakeLog" class="crypto-log">
-                    [SYSTEM] Awaiting P2P Signal...<br>
-                </div>
-            </div>
-
-            <div class="mt-auto">
-                <button class="btn btn-sm btn-outline-info w-100 rounded-3" onclick="copyInvite()">
-                    <i class="bi bi-share me-2"></i> Copy Invite Link
-                </button>
+            <div id="log-box" class="flex-1 p-3 overflow-y-auto space-y-1.5">
+                <div class="log-line text-cyan-400/70">[SYS] terminal ready</div>
             </div>
         </aside>
 
-        <!-- Main Comm Hub -->
-        <main class="comm-hub">
-            <div id="chatFlow">
-                <!-- Initial System Message -->
-                <div class="text-center my-4">
-                    <span class="badge bg-dark border border-secondary text-main px-3 py-2">
-                        <i class="bi bi-broadcast me-2 "></i> P2P Channel Initialized. Type to communicate.
-                    </span>
+        <!-- Main Chat Core -->
+        <div class="relative flex-1 flex flex-col overflow-hidden">
+            <div class="scanline absolute top-0 left-0 w-full h-full pointer-events-none z-0 opacity-30"></div>
+            
+            <div id="chat-box" class="flex-1 overflow-y-auto p-5 md:p-7 space-y-5 relative z-10">
+                <div id="connection-status-msg" class="flex flex-col items-center justify-center text-center py-12">
+                    <div class="relative w-14 h-14 mb-5">
+                        <div class="absolute inset-0 rounded-full border-2 border-cyan-500/30 animate-ping"></div>
+                        <div class="absolute inset-0 rounded-full border-t-2 border-cyan-400 animate-spin"></div>
+                    </div>
+                    <span class="text-cyan-300/90 font-mono text-base tracking-widest uppercase animate-pulse">Establishing secure tunnel</span>
+                    <span class="text-xs text-slate-400 mt-3 font-mono">WebRTC handshake in progress...</span>
                 </div>
             </div>
 
-            <div class="input-area">
-                <div class="cyber-input-group">
-                    <input type="text" id="messageInput" placeholder="Enter encrypted transmission..." autocomplete="off">
-                    <button class="btn btn-info rounded-3 px-4" onclick="sendMessage()">
-                        <i class="bi bi-send-fill"></i>
+            <!-- Message composer area - refined & larger -->
+            <div class="p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent backdrop-blur-md border-t border-cyan-500/20 z-20">
+                <form id="chat-form" class="flex gap-4 max-w-4xl mx-auto w-full items-center">
+                    <div class="flex-1 relative group">
+                        <span class="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-cyan-400/80 font-mono text-base font-bold z-10">❯</span>
+                        <input type="text" id="message-input" placeholder="Encrypted message ..." 
+                            class="w-full bg-slate-950/80 border border-cyan-500/30 rounded-xl pl-10 md:pl-11 pr-5 py-3.5 md:py-4 focus:outline-none neon-input text-base font-mono tracking-wide text-cyan-100 placeholder:text-slate-500 transition-all">
+                    </div>
+                    <button type="submit" id="send-btn" class="relative overflow-hidden bg-slate-800 text-slate-300 font-bold px-6 md:px-9 py-3.5 rounded-xl border border-white/10 transition-all uppercase text-xs md:text-sm tracking-[0.2em] cursor-not-allowed shadow-md disabled:opacity-50 disabled:grayscale disabled:scale-100" disabled>
+                        <span class="relative z-10">TX</span>
+                        <span class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 opacity-0 transition-opacity duration-300"></span>
                     </button>
+                </form>
+                <div class="text-center text-[13px] text-slate-500 font-mono mt-3 flex justify-center gap-4">
+                    <span>◈ E2E ENCRYPTED ◈</span>
+                    <span class="hidden sm:inline-block">⛁ WEBRTC SECURE</span>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
-    <script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+        import { deriveKey, encryptMessage, decryptMessage } from '../crypto.js';
+
         const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('room') || 'GHOST-ALPHA';
-        document.getElementById('roomIdDisplay').textContent = roomId.toUpperCase();
+        const roomId = urlParams.get('room');
+        const socket = io();
+        let peerConnection;
+        let dataChannel;
+        let cryptoKey;
+        let pendingCandidates = [];
 
-        function addLog(text) {
-            const log = document.getElementById('handshakeLog');
-            log.innerHTML += `> ${text}<br>`;
-            log.scrollTop = log.scrollHeight;
+        const chatBox = document.getElementById('chat-box');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const connMsg = document.getElementById('connection-status-msg');
+        const logBox = document.getElementById('log-box');
+        const statusEl = document.getElementById('status');
+        const inviteUrlEl = document.getElementById('invite-url');
+        const toggleConsoleBtn = document.getElementById('toggle-console');
+        const sidebar = document.getElementById('sidebar');
+
+        toggleConsoleBtn.onclick = () => {
+            sidebar.classList.toggle('console-closed');
+            sidebar.classList.toggle('console-open');
+        };
+
+        async function init() {
+            if (!roomId) {
+                window.location.href = '/';
+                return;
+            }
+
+            inviteUrlEl.innerText = window.location.href;
+            inviteUrlEl.onclick = () => {
+                navigator.clipboard.writeText(window.location.href);
+                inviteUrlEl.innerText = "✓ COPIED!";
+                setTimeout(() => inviteUrlEl.innerText = window.location.href, 1800);
+                gsap.to(inviteUrlEl, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
+            };
+
+            cryptoKey = await deriveKey(roomId);
+            socket.emit('join-room', roomId);
+            gsap.from("main", { opacity: 0, scale: 0.98, duration: 0.8, ease: "back.out(0.5)" });
         }
 
-        function appendMessage(text, type) {
-            const chat = document.getElementById('chatFlow');
-            const div = document.createElement('div');
-            div.className = `msg-bubble ${type === 'sent' ? 'msg-sent' : 'msg-received'}`;
-            div.innerHTML = `
-                <div class="text-content">${text}</div>
-                <span class="msg-meta">${new Date().toLocaleTimeString()} // AES-GCM</span>
-            `;
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            if (!input.value.trim()) return;
-            
-            appendMessage(input.value, 'sent');
-            input.value = '';
-            
-            // Mock peer response
-            setTimeout(() => {
-                addLog('DATA_RECV: Packet verified.');
-                appendMessage('Transmission acknowledged. Channel remains secure.', 'received');
-            }, 1200);
-        }
-
-        function copyInvite() {
-            navigator.clipboard.writeText(window.location.href);
-            addLog('SHARE: Invite link copied.');
-        }
-
-        function startCall(type) {
-            window.location.href = `call.html?room=${roomId}&type=${type}`;
-        }
-
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('active');
-            addLog('SYSTEM: Tactical interface toggled.');
-        }
-
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') sendMessage();
+        socket.on('user-connected', (userId) => {
+            createPeerConnection(userId, true);
         });
 
-        // Initial Handshake Sequence Mock
-        setTimeout(() => addLog('STUN: Server reached.'), 500);
-        setTimeout(() => addLog('ICE: Candidate generated.'), 1000);
-        setTimeout(() => addLog('KEY: Generating ECDH...'), 1500);
+        function createPeerConnection(userId, isInitiator) {
+            addLog(`P2P_INIT: Role as ${isInitiator ? 'INITIATOR' : 'RECEIVER'}`);
+            addLog(`HANDSHAKE_START: Target ${userId}`);
+            
+            if (peerConnection) {
+                peerConnection.close();
+            }
+
+            peerConnection = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            });
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    addLog("ICE_CANDIDATE: Propagating network path...");
+                    socket.emit('signal', { to: userId, signal: event.candidate });
+                }
+            };
+
+            peerConnection.onconnectionstatechange = () => {
+                addLog(`STATE_CHANGE: ${peerConnection.connectionState.toUpperCase()}`);
+                if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'closed') {
+                    updateStatusUI(false);
+                    addLog("CRITICAL: P2P handshake failed.");
+                } else if (peerConnection.connectionState === 'connected') {
+                    addLog("TRANS_ACTIVE: Physical link established.");
+                }
+            };
+
+            peerConnection.oniceconnectionstatechange = () => {
+                addLog(`ICE_STATE: ${peerConnection.iceConnectionState.toUpperCase()}`);
+            };
+
+            if (isInitiator) {
+                dataChannel = peerConnection.createDataChannel('chat');
+                setupDataChannel();
+                peerConnection.createOffer().then(async (offer) => {
+                    addLog("SDP_OFFER: Local description generated.");
+                    await peerConnection.setLocalDescription(offer);
+                    socket.emit('signal', { to: userId, signal: offer });
+                });
+            } else {
+                peerConnection.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel();
+                };
+            }
+        }
+
+        function updateStatusUI(connected) {
+            if (connected) {
+                statusEl.innerHTML = `
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 shadow-[0_0_8px_#0ff]"></span>
+                    </span>
+                    <span class="hidden sm:inline">SECURE LINK</span><span class="sm:hidden">ON</span>
+                `;
+                statusEl.className = "status-badge text-[11px] md:text-sm font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-400/50 bg-cyan-950/30 shadow-lg";
+            } else {
+                statusEl.innerHTML = `
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                    <span class="hidden sm:inline">DISCONNECTED</span><span class="sm:hidden">OFF</span>
+                `;
+                statusEl.className = "status-badge text-[11px] md:text-sm font-bold uppercase tracking-wider text-red-300 flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-950/20";
+            }
+        }
+
+        function setupDataChannel() {
+            if (!dataChannel) return;
+            
+            dataChannel.onopen = () => {
+                addLog("CHANNEL_OPEN: DataChannel encryption ready.");
+                updateStatusUI(true);
+                
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('bg-slate-800', 'text-slate-300', 'cursor-not-allowed', 'opacity-50');
+                sendBtn.classList.add('btn-glow-enabled', 'text-white', 'shadow-lg');
+                
+                if(connMsg) {
+                    gsap.to(connMsg, { opacity: 0, y: -20, duration: 0.4, onComplete: () => connMsg.remove() });
+                }
+
+                addLog("SECURE_LINK: E2EE Tunnel verified.");
+            };
+            dataChannel.onmessage = async (e) => {
+                addLog("PACKET_RECV: Decrypting incoming stream...");
+                const decrypted = await decryptMessage(JSON.parse(e.data), cryptoKey);
+                addMessage('Peer', decrypted);
+            };
+            dataChannel.onclose = () => {
+                addLog("CHANNEL_CLOSE: Link terminated.");
+                updateStatusUI(false);
+                sendBtn.disabled = true;
+                sendBtn.classList.add('bg-slate-800', 'text-slate-300', 'cursor-not-allowed', 'opacity-50');
+                sendBtn.classList.remove('btn-glow-enabled', 'text-white');
+            };
+            dataChannel.onerror = (error) => {
+                console.error("DataChannel error:", error);
+                addMessage('System', `⚠️ DataChannel error: ${error.message || 'Unknown error'}`, 'text-red-300 text-xs italic');
+            };
+        }
+
+        function addLog(text) {
+            const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const log = document.createElement('div');
+            log.className = 'log-line text-cyan-300/80 text-[13px] font-mono flex gap-2 items-start';
+            log.innerHTML = `
+                <span class="text-cyan-400/60 shrink-0">[${timestamp}]</span>
+                <span class="break-all uppercase tracking-tighter">${text}</span>
+            `;
+            logBox.appendChild(log);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function addMessage(sender, text, extraClass = '') {
+            const isSelf = sender === 'You';
+            const isSystem = sender === 'System';
+            
+            const div = document.createElement('div');
+            div.className = `flex w-full ${isSystem ? 'justify-center' : (isSelf ? 'justify-end' : 'justify-start')} animate-fadeIn`;
+            
+            let bubbleClass = '';
+            if (isSystem) {
+                bubbleClass = 'system-message bg-black/50 backdrop-blur-sm border border-white/15 text-gray-200 text-center';
+            } else {
+                bubbleClass = `max-w-[85%] md:max-w-[70%] p-3.5 md:p-4 message-bubble transition-all ${isSelf ? 'bubble-tech-self' : 'bubble-tech-peer'} ${extraClass}`;
+            }
+
+            const inner = document.createElement('div');
+            inner.className = bubbleClass;
+            
+            if (!isSystem) {
+                inner.innerHTML = `
+                    <div class="text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-1 ${isSelf ? 'text-cyan-300 justify-end' : 'text-indigo-300'}">
+                        ${!isSelf ? '◈ ' : ''}${sender}${isSelf ? ' ◈' : ''}
+                    </div>
+                    <div class="text-base md:text-lg leading-relaxed break-words tracking-wide font-medium text-gray-100">${escapeHtml(text)}</div>
+                `;
+            } else {
+                inner.innerHTML = `<div class="text-sm font-mono text-gray-200">${escapeHtml(text)}</div>`;
+            }
+            
+            div.appendChild(inner);
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            gsap.from(inner, { 
+                y: 12, 
+                scale: isSystem ? 1 : 0.97,
+                opacity: 0, 
+                duration: 0.3,
+                ease: "back.out(0.5)"
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
+        }
+
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            if (dataChannel && dataChannel.readyState === 'open') {
+                try {
+                    addLog("PACKET_SEND: Encrypting payload...");
+                    const encrypted = await encryptMessage(text, cryptoKey);
+                    dataChannel.send(JSON.stringify(encrypted));
+                    addMessage('You', text);
+                    messageInput.value = '';
+                    gsap.to(messageInput, { scale: 1.02, duration: 0.1, yoyo: true, repeat: 1 });
+                } catch (err) {
+                    console.error("Encryption/Send error:", err);
+                    addMessage('System', '⚠️ Encryption failed. Retry.', 'text-red-300');
+                }
+            } else {
+                addLog("ERROR: Buffer busy or link inactive.");
+                addMessage('System', '🔒 Channel not ready — waiting for secure link', 'text-amber-300/80');
+            }
+        };
+
+        socket.on('signal', async (data) => {
+            if (!peerConnection) createPeerConnection(data.from, false);
+            
+            if (data.signal && data.signal.type === 'offer') {
+                addLog("SDP_RECV: Remote offer detected.");
+                await peerConnection.setRemoteDescription(data.signal);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                socket.emit('signal', { to: data.from, signal: answer });
+                await processPendingCandidates();
+            } else if (data.signal && data.signal.type === 'answer') {
+                addLog("SDP_RECV: Handshake response received.");
+                await peerConnection.setRemoteDescription(data.signal);
+                await processPendingCandidates();
+            } else if (data.signal && data.signal.candidate) {
+                if (peerConnection.remoteDescription && peerConnection.remoteDescription.sdp) {
+                    try {
+                        await peerConnection.addIceCandidate(data.signal);
+                    } catch (e) { 
+                        console.error("Error adding ICE candidate directly:", e); 
+                    }
+                } else {
+                    pendingCandidates.push(data.signal);
+                }
+            }
+        });
+
+        async function processPendingCandidates() {
+            for (const cand of pendingCandidates) {
+                try { 
+                    await peerConnection.addIceCandidate(cand); 
+                } catch (e) { 
+                    console.error("Error adding queued ICE candidate:", e); 
+                }
+            }
+            pendingCandidates = [];
+        }
+        
+        init();
     </script>
 </body>
 </html>
