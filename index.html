@@ -386,7 +386,7 @@
 
             // Step 2: Authorize and Enter
             sessionStorage.setItem('ghw_session_key', pendingRoomId);
-            window.location.href = `frontend/room.html?room=${encodeURIComponent(pendingRoomId)}`;
+            window.location.href = `frontend/room.html?room=${encodeURIComponent(pendingRoomId)}#${pendingRoomId}`;
         }
 
         // Join existing room using input value
@@ -427,7 +427,7 @@
             // Set the session key. room.html should check this to prevent direct URL access.
             sessionStorage.setItem('ghw_session_key', roomCode);
 
-            window.location.href = `frontend/room.html?room=${encodeURIComponent(roomCode)}`;
+            window.location.href = `frontend/room.html?room=${encodeURIComponent(roomCode)}#${roomCode}`;
         }
 
         // attach event listeners

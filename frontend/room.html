@@ -346,6 +346,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room');
+        const secretKey = window.location.hash.substring(1) || roomId; // Use hash for crypto
         const socket = io();
         let peerConnection;
         let dataChannel;
@@ -382,7 +383,7 @@
                 gsap.to(inviteUrlEl, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
             };
 
-            cryptoKey = await deriveKey(roomId);
+            cryptoKey = await deriveKey(secretKey);
             socket.emit('join-room', roomId);
             gsap.from("main", { opacity: 0, scale: 0.98, duration: 0.8, ease: "back.out(0.5)" });
         }
@@ -529,14 +530,19 @@
             inner.className = bubbleClass;
             
             if (!isSystem) {
-                inner.innerHTML = `
-                    <div class="text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-1 ${isSelf ? 'text-cyan-300 justify-end' : 'text-indigo-300'}">
-                        ${!isSelf ? '◈ ' : ''}${sender}${isSelf ? ' ◈' : ''}
-                    </div>
-                    <div class="text-base md:text-lg leading-relaxed break-words tracking-wide font-medium text-gray-100">${escapeHtml(text)}</div>
-                `;
+                const header = document.createElement('div');
+                header.className = `text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-1 ${isSelf ? 'text-cyan-300 justify-end' : 'text-indigo-300'}`;
+                header.textContent = `${!isSelf ? '◈ ' : ''}${sender}${isSelf ? ' ◈' : ''}`;
+                
+                const body = document.createElement('div');
+                body.className = "text-base md:text-lg leading-relaxed break-words tracking-wide font-medium text-gray-100";
+                body.textContent = text; // Safe assignment
+                
+                inner.appendChild(header);
+                inner.appendChild(body);
             } else {
-                inner.innerHTML = `<div class="text-sm font-mono text-gray-200">${escapeHtml(text)}</div>`;
+                inner.className += " text-sm font-mono text-gray-200";
+                inner.textContent = text;
             }
             
             div.appendChild(inner);
