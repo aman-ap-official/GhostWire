@@ -279,7 +279,7 @@
             <!-- Action Card: Join / Create Room (hero section card) -->
             <div class="action-panel mx-auto p-4 p-md-5 mt-4" id="actionPanel">
                 <div class="mb-4">
-                    <input type="text" id="roomIdInput" class="form-control form-control-lg text-uppercase" placeholder="⚡ ENTER ROOM ID" autocomplete="off" spellcheck="false" maxlength="12">
+                    <input type="text" id="roomIdInput" class="form-control form-control-lg" placeholder="⚡ ENTER SECURE ROOM KEY" autocomplete="off" spellcheck="false" maxlength="8">
                 </div>
                 <div class="d-grid gap-3">
                     <button class="btn btn-cyber-primary btn-lg" id="joinRoomBtn">⟁ JOIN ROOM ⟁</button>
@@ -299,7 +299,7 @@
     <!-- Features Section: Why GhostWire -->
     <section class="py-5 position-relative" style="background: linear-gradient(180deg, rgba(5,5,20,0.9) 0%, #050510 100%); z-index: 5;">
         <div class="container py-4">
-            <h2 class="text-center display-5 fw-bold mb-5" id="featuresTitle" style="font-family: 'Orbitron'; background: linear-gradient(135deg, #D83CF0, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent;">⟡ CORE ARMOR ⟡</h2>
+            <h2 class="text-center display-5 fw-bold mb-5" id="featuresTitle" style="font-family: 'Orbitron'; background: linear-gradient(135deg, #D83CF0, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent;">⟡ ENCRYPTED ROOM ⟡</h2>
             <div class="row g-4">
                 <div class="col-md-4" id="feat1">
                     <div class="feature-card p-4 text-center">
@@ -354,28 +354,55 @@
             return id;
         }
 
-        // Create new secure room -> redirect
+        let pendingRoomId = null;
+
+        // Create new secure room -> Provide Key to user first
         function createRoom() {
-            const newId = generateRoomId(8);
-            window.location.href = `frontend/room.html?room=${encodeURIComponent(newId)}`;
+            const inputElem = document.getElementById('roomIdInput');
+            const createBtn = document.getElementById('createRoomBtn');
+
+            if (!pendingRoomId) {
+                // Step 1: Generate the key and show it to the user
+                pendingRoomId = generateRoomId(8);
+                inputElem.value = pendingRoomId.toUpperCase();
+                
+                // UI Transformation
+                createBtn.innerHTML = "⎚ ENTER ROOM ⎚";
+                createBtn.classList.replace('btn-cyber-secondary', 'btn-cyber-primary');
+                
+                gsap.to(inputElem, {
+                    borderColor: "#00ff88",
+                    boxShadow: "0 0 25px rgba(0, 255, 136, 0.5)",
+                    duration: 0.4
+                });
+                return;
+            }
+
+            // Step 2: Authorize and Enter
+            sessionStorage.setItem('ghw_session_key', pendingRoomId);
+            window.location.href = `frontend/room.html?room=${encodeURIComponent(pendingRoomId)}`;
         }
 
         // Join existing room using input value
         function joinRoom() {
             const inputElem = document.getElementById('roomIdInput');
-            let roomCode = inputElem.value.trim();
-            if (roomCode === "") {
-                // shake + error glow
+            const roomCode = inputElem.value.trim().toLowerCase();
+
+            // REQUIREMENT: User enters the Key directly (e.g., 2ttzcjbe)
+            const isValidKey = /^[a-z0-9]{8}$/.test(roomCode);
+            
+            if (!isValidKey) {
+                // Deny direct ID entry - enforce the URL "Key" protocol
                 gsap.to(inputElem, {
-                    x: -8,
+                    x: -12,
                     repeat: 4,
                     yoyo: true,
                     ease: "power1.inOut",
                     onComplete: () => gsap.to(inputElem, { x: 0 })
                 });
                 gsap.to(inputElem, {
-                    borderColor: "#ff3366",
-                    boxShadow: "0 0 16px rgba(255, 51, 102, 0.6)",
+                    borderColor: "#ff0055",
+                    boxShadow: "0 0 25px rgba(255, 0, 85, 0.5)",
                     duration: 0.2,
                     onComplete: () => {
                         gsap.to(inputElem, {
@@ -386,11 +413,10 @@
                 });
                 return;
             }
-            roomCode = roomCode.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (roomCode.length < 3) {
-                gsap.to(inputElem, { scale: 1.02, repeat: 2 });
-                return;
-            }
+
+            // Set the session key. room.html should check this to prevent direct URL access.
+            sessionStorage.setItem('ghw_session_key', roomCode);
+
             window.location.href = `frontend/room.html?room=${encodeURIComponent(roomCode)}`;
         }
 

@@ -374,11 +374,11 @@
                 return;
             }
 
-            inviteUrlEl.innerText = window.location.href;
+            inviteUrlEl.innerText = `KEY: ${roomId.toUpperCase()}`;
             inviteUrlEl.onclick = () => {
-                navigator.clipboard.writeText(window.location.href);
+                navigator.clipboard.writeText(roomId.toUpperCase());
                 inviteUrlEl.innerText = "✓ COPIED!";
-                setTimeout(() => inviteUrlEl.innerText = window.location.href, 1800);
+                setTimeout(() => inviteUrlEl.innerText = `KEY: ${roomId.toUpperCase()}`, 1800);
                 gsap.to(inviteUrlEl, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
             };
 
@@ -493,7 +493,9 @@
             };
             dataChannel.onerror = (error) => {
                 console.error("DataChannel error:", error);
-                addMessage('System', `⚠️ DataChannel error: ${error.message || 'Unknown error'}`, 'text-red-300 text-xs italic');
+                addLog("CRITICAL: Link synchronization lost.");
+                updateStatusUI(false);
+                addMessage('System', '⚠️ User DISCONNECTED or left the Room.');
             };
         }
 
