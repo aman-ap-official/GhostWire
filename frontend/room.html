@@ -366,14 +366,20 @@
         </div>
     </main>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="module">
         import { deriveKey, encryptMessage, decryptMessage } from '../crypto.js';
 
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room');
         const secretKey = window.location.hash.substring(1) || roomId; // Use hash for crypto
-        const socket = io();
+        
+        // If hosted on Netlify, point this to your Render URL
+        // If hosted on Render entirely, io() is fine.
+        const socket = io(window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : window.location.origin);
+
         let peerConnection;
         let dataChannel;
         let cryptoKey;
