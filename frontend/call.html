@@ -293,13 +293,21 @@
         let localStream;
         let peerConnection;
         let pendingCandidates = [];
-        const socket = io();
+        const socket = io({
+            transports: ["websocket"]
+        });
 
         const urlParams = new URLSearchParams(window.location.search);
         const callType = urlParams.get('type') || 'video';
         const roomId = urlParams.get('room');
 
-        const iceConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        const iceConfig = { 
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun.services.mozilla.com' }
+            ] 
+        };
 
         async function processPendingCandidates() {
             for (const cand of pendingCandidates) {

@@ -5,7 +5,12 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 // Serve the landing page
 app.get('/', (req, res) => {
@@ -17,11 +22,16 @@ app.get('/crypto.js', (req, res) => res.sendFile(path.join(__dirname, 'crypto.js
 app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
 
 io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`);
+
     socket.on('join-room', (roomId) => {
+        console.log(`User ${socket.id} joining room: ${roomId}`);
         socket.join(roomId);
         // Notify others in the room
         socket.to(roomId).emit('user-connected', socket.id);
+        
         socket.on('disconnect', () => {
+            console.log(`User disconnected: ${socket.id}`);
             socket.to(roomId).emit('user-disconnected', socket.id);
         });
     });

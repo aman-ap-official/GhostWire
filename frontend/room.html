@@ -584,7 +584,9 @@
         const secretKey = window.location.hash.substring(1) || roomId; // Use hash for crypto
         
         // Automatically connects to the current host
-        const socket = io();
+        const socket = io({
+            transports: ["websocket"]
+        });
 
         let peerConnection;
         let dataChannel;
@@ -717,7 +719,12 @@
             }
 
             peerConnection = new RTCPeerConnection({
-                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun.services.mozilla.com' }
+                ]
             });
 
             peerConnection.onicecandidate = (event) => {
