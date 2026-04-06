@@ -265,6 +265,215 @@
             50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.9); border-color: rgba(0, 255, 255, 1); transform: scale(1.05); }
         }
     </style>
+    
+    <!-- ========== ENHANCED RESPONSIVE STYLES (NO LOGIC CHANGES) ========== -->
+    <style>
+        /* ----- ULTRA SMALL DEVICES (<= 480px) ----- */
+        @media (max-width: 480px) {
+            /* header layout: prevent overflow, tighter gaps */
+            header {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            header > div:first-child {
+                gap: 0.5rem !important;
+                flex-wrap: wrap;
+                min-width: 0;
+            }
+            header > div:last-child {
+                gap: 0.4rem !important;
+            }
+            /* room display text shrink */
+            #room-display {
+                font-size: 0.7rem !important;
+            }
+            #invite-url {
+                font-size: 0.7rem !important;
+                padding: 0.2rem 0.6rem !important;
+                max-width: 130px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            h1 {
+                font-size: 1.3rem !important;
+            }
+            /* video/voice buttons smaller gap */
+            .flex.items-center.gap-2.mr-2 {
+                gap: 0.3rem !important;
+                margin-right: 0.2rem !important;
+            }
+            .p-2.5 {
+                padding: 0.5rem !important;
+            }
+            .status-badge {
+                padding: 0.25rem 0.65rem !important;
+                font-size: 0.65rem !important;
+            }
+            /* chat bubbles better width for small screens */
+            .message-bubble {
+                max-width: 92% !important;
+                padding: 0.75rem 1rem !important;
+            }
+            .message-bubble div {
+                font-size: 0.95rem !important;
+            }
+            /* chat input area tighter */
+            #chat-form {
+                gap: 0.5rem !important;
+            }
+            .neon-input {
+                padding: 0.7rem 0.8rem !important;
+                font-size: 0.9rem !important;
+            }
+            #send-btn {
+                padding: 0.7rem 1rem !important;
+                font-size: 0.7rem !important;
+            }
+            #chat-box {
+                padding: 1rem 0.9rem !important;
+            }
+            /* system message adjustments */
+            .system-message {
+                font-size: 0.7rem !important;
+                padding: 4px 12px !important;
+            }
+            /* call modal inner padding */
+            .glass-panel.p-8 {
+                padding: 1.2rem !important;
+            }
+            .glass-panel h2 {
+                font-size: 1.2rem !important;
+                margin-bottom: 1rem !important;
+            }
+            #join-call-btn, #dismiss-call-btn {
+                padding: 0.75rem !important;
+            }
+            /* log box font */
+            .log-line {
+                font-size: 0.65rem !important;
+                padding-left: 6px !important;
+            }
+        }
+
+        /* ----- SMALL TO MEDIUM PHONES (481px - 640px) ----- */
+        @media (min-width: 481px) and (max-width: 640px) {
+            header {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            header > div:first-child {
+                gap: 0.75rem !important;
+            }
+            #invite-url {
+                max-width: 160px !important;
+                font-size: 0.75rem !important;
+            }
+            .message-bubble {
+                max-width: 88% !important;
+            }
+            #chat-form {
+                gap: 0.75rem !important;
+            }
+            .neon-input {
+                padding: 0.8rem 1rem !important;
+            }
+            #send-btn {
+                padding: 0.8rem 1.2rem !important;
+            }
+        }
+
+        /* ----- IMPROVE TOUCH TARGETS & SCROLL BEHAVIOR ----- */
+        @media (pointer: coarse) {
+            button, .url-pill, #toggle-console, #send-btn {
+                cursor: pointer;
+                touch-action: manipulation;
+            }
+            #message-input {
+                font-size: 16px !important; /* prevent zoom on iOS input focus */
+            }
+            .btn-glow-enabled:active, .url-pill:active, #toggle-console:active {
+                transform: scale(0.96);
+                transition: transform 0.05s;
+            }
+        }
+
+        /* ----- PREVENT ANY HORIZONTAL SCROLL & SAFE CONTAINMENT ----- */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+        main, .relative.flex-1, header, #sidebar, #chat-box {
+            overflow-x: hidden;
+        }
+        .break-words, .message-bubble div {
+            word-break: break-word;
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+        /* ensure invite url never overflows */
+        #invite-url {
+            display: inline-block;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* extra side padding for tiny screens on chat container */
+        @media (max-width: 380px) {
+            #chat-box {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            .message-bubble {
+                padding: 0.65rem 0.9rem !important;
+            }
+            .bubble-tech-self, .bubble-tech-peer {
+                border-radius: 20px !important;
+            }
+            header h1 {
+                font-size: 1.2rem !important;
+            }
+            .status-badge span:first-child {
+                margin-right: 2px;
+            }
+        }
+
+        /* fix sidebar open/close on landscape tiny heights */
+        @media (max-width: 1023px) and (max-height: 500px) {
+            .console-open {
+                height: 180px !important;
+            }
+            #log-box {
+                padding: 0.5rem !important;
+            }
+            .log-line {
+                margin-bottom: 4px;
+                font-size: 0.6rem;
+            }
+        }
+
+        /* chat bubbles hover effect (optional, not breaking) */
+        .message-bubble {
+            transition: transform 0.1s ease, box-shadow 0.2s;
+        }
+        .message-bubble:active {
+            transform: scale(0.99);
+        }
+
+        /* adjust call notification modal to be fully readable on small */
+        @media (max-width: 480px) {
+            #call-notification .glass-panel {
+                max-width: 90% !important;
+                margin: 0 1rem !important;
+                padding: 1rem !important;
+            }
+            #call-notification-text {
+                font-size: 1.1rem !important;
+            }
+        }
+    </style>
 </head>
 <body class="h-screen flex flex-col">
 

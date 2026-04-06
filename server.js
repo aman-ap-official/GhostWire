@@ -7,7 +7,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(__dirname));
+// Serve the landing page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Explicitly serve crypto.js and the frontend folder
+app.get('/crypto.js', (req, res) => res.sendFile(path.join(__dirname, 'crypto.js')));
+app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
 
 io.on('connection', (socket) => {
     socket.on('join-room', (roomId) => {
