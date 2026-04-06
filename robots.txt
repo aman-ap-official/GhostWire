@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Specific AI Crawlers
+User-agent: GPTBot
+Allow: /
+User-agent: Google-InspectionTool
+Allow: /
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://ghostwire-ctav.onrender.com/sitemap.xml

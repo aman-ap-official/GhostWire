@@ -1,21 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GhostWire | Secure P2P Encrypted Communication</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts: Orbitron (titles) + Rajdhani (body) -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- GSAP & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    
-    <style>
+    <head>
+        <!-- Primary Meta Tags -->
+        <title>GhostWire | Advanced Real-Time Communication by AMAN
+            PANDEY</title>
+        <meta name="title"
+            content="GhostWire | Real-Time Engine by AMAN PANDEY">
+        <meta name="description"
+            content="GhostWire (gost wire) is a high-performance real-time communication engine developed by AMAN PANDEY. Optimized for low-latency WebSockets and scalable Node.js architecture.">
+        <meta name="keywords"
+            content="GhostWire, gost wire, Aman Pandey, Real-time engine, Socket.io, Node.js developer, Ghostwire-ctav">
+
+        <!-- Open Graph / Facebook (For AI Bots and Social Media) -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://ghostwire-ctav.onrender.com/">
+        <meta property="og:title"
+            content="GhostWire | High-Concurrency Real-Time Suite">
+        <meta property="og:description"
+            content="Experience seamless real-time data transfer with GhostWire. Created by AMAN PANDEY.">
+        <meta property="og:image"
+            content="https://ghostwire-ctav.onrender.com/logo.png">
+
+        <!-- Canonical Tag (Tells Google this is the original link) -->
+        <link rel="canonical" href="https://ghostwire-ctav.onrender.com/" />
+
+        <!-- Bootstrap 5 CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+        <!-- Google Fonts: Orbitron (titles) + Rajdhani (body) -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <!-- GSAP & ScrollTrigger -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+        <style>
         * {
             margin: 0;
             padding: 0;
@@ -262,91 +288,124 @@
             .action-panel { padding: 1.5rem; margin: 0 1rem; }
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
 
-    <!-- animated background layers -->
-    <div class="hero-bg-animation"></div>
-    <div class="grid-overlay"></div>
-    <div class="scanline"></div>
+        <!-- animated background layers -->
+        <div class="hero-bg-animation"></div>
+        <div class="grid-overlay"></div>
+        <div class="scanline"></div>
 
-    <!-- main content -->
-    <div class="hero-section">
-        <div class="container position-relative z-3">
-            <div class="mb-4">
-                <h1 class="glow-title" id="heroTitle">GHOSTWIRE</h1>
-                <div class="mt-3 d-flex justify-content-center">
-                    <span class="subtitle py-2">◈ ZERO-KNOWLEDGE P2P CHAT ◈</span>
-                </div>
-                <p class="mt-3 text-light-emphasis fs-5 fw-light">Encrypted whispers. No tracking. No middlemen.</p>
-            </div>
-
-            <!-- Action Card: Join / Create Room (hero section card) -->
-            <div class="action-panel mx-auto p-4 p-md-5 mt-4" id="actionPanel">
+        <!-- main content -->
+        <div class="hero-section">
+            <div class="container position-relative z-3">
                 <div class="mb-4">
-                    <input type="text" id="roomIdInput" class="form-control form-control-lg" placeholder="⚡ ENTER SECURE ROOM KEY" autocomplete="off" spellcheck="false" maxlength="8">
-                    <div id="roomKeyError" class="text-danger mt-2 small fw-bold opacity-0" style="font-family: 'Orbitron'; letter-spacing: 1px; font-size: 0.75rem;">INVALID ROOM KEY</div>
+                    <h1 class="glow-title" id="heroTitle">GHOSTWIRE</h1>
+                    <div class="mt-3 d-flex justify-content-center">
+                        <span class="subtitle py-2">◈ ZERO-KNOWLEDGE P2P CHAT
+                            ◈</span>
+                    </div>
+                    <p class="mt-3 text-light-emphasis fs-5 fw-light">Encrypted
+                        whispers. No tracking. No middlemen.</p>
                 </div>
-                <div class="d-grid gap-3">
-                    <button class="btn btn-cyber-primary btn-lg" id="joinRoomBtn">⟁ JOIN ROOM ⟁</button>
-                    <button class="btn btn-cyber-secondary btn-lg" id="createRoomBtn">⎚ CREATE SECURE ROOM ⎚</button>
-                </div>
-                <div class="mt-4 d-flex justify-content-center">
-                    <div class="encryption-note">
-                        <i class="bi bi-shield-lock-fill text-cyan-400"></i>
-                        <span>End-to-end encrypted · keys never leave your browser</span>
-                        <i class="bi bi-incognito"></i>
+
+                <!-- Action Card: Join / Create Room (hero section card) -->
+                <div class="action-panel mx-auto p-4 p-md-5 mt-4"
+                    id="actionPanel">
+                    <div class="mb-4">
+                        <input type="text" id="roomIdInput"
+                            class="form-control form-control-lg"
+                            placeholder="⚡ ENTER SECURE ROOM KEY"
+                            autocomplete="off" spellcheck="false" maxlength="8">
+                        <div id="roomKeyError"
+                            class="text-danger mt-2 small fw-bold opacity-0"
+                            style="font-family: 'Orbitron'; letter-spacing: 1px; font-size: 0.75rem;">INVALID
+                            ROOM KEY</div>
+                    </div>
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-cyber-primary btn-lg"
+                            id="joinRoomBtn">⟁ JOIN ROOM ⟁</button>
+                        <button class="btn btn-cyber-secondary btn-lg"
+                            id="createRoomBtn">⎚ CREATE SECURE ROOM ⎚</button>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-center">
+                        <div class="encryption-note">
+                            <i class="bi bi-shield-lock-fill text-cyan-400"></i>
+                            <span>End-to-end encrypted · keys never leave your
+                                browser</span>
+                            <i class="bi bi-incognito"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Features Section: Why GhostWire -->
-    <section class="py-5 position-relative" style="background: linear-gradient(180deg, rgba(5,5,20,0.9) 0%, #050510 100%); z-index: 5;">
-        <div class="container py-4">
-            <h2 class="text-center display-5 fw-bold mb-5" id="featuresTitle" style="font-family: 'Orbitron'; background: linear-gradient(135deg, #D83CF0, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent;">⟡ ENCRYPTED ROOM ⟡</h2>
-            <div class="row g-4">
-                <div class="col-md-4" id="feat1">
-                    <div class="feature-card p-4 text-center">
-                        <i class="bi bi-lock-fill feature-icon"></i>
-                        <h3 class="h5 fw-bold mt-3 text-cyan-300">AES-GCM ENCRYPTION</h3>
-                        <p class="text-light-emphasis mt-2">Military-grade symmetric encryption derived from a shared secret — only participants can decipher messages.</p>
+        <!-- Features Section: Why GhostWire -->
+        <section class="py-5 position-relative"
+            style="background: linear-gradient(180deg, rgba(5,5,20,0.9) 0%, #050510 100%); z-index: 5;">
+            <div class="container py-4">
+                <h2 class="text-center display-5 fw-bold mb-5"
+                    id="featuresTitle"
+                    style="font-family: 'Orbitron'; background: linear-gradient(135deg, #D83CF0, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent;">⟡
+                    ENCRYPTED ROOM ⟡</h2>
+                <div class="row g-4">
+                    <div class="col-md-4" id="feat1">
+                        <div class="feature-card p-4 text-center">
+                            <i class="bi bi-lock-fill feature-icon"></i>
+                            <h3 class="h5 fw-bold mt-3 text-cyan-300">AES-GCM
+                                ENCRYPTION</h3>
+                            <p class="text-light-emphasis mt-2">Military-grade
+                                symmetric encryption derived from a shared
+                                secret — only participants can decipher
+                                messages.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" id="feat2">
+                        <div class="feature-card p-4 text-center">
+                            <i
+                                class="bi bi-lightning-charge-fill feature-icon"></i>
+                            <h3 class="h5 fw-bold mt-3 text-cyan-300">WEBRTC
+                                P2P</h3>
+                            <p class="text-light-emphasis mt-2">Direct,
+                                low-latency data channels. No server relays, no
+                                logs, pure peer-to-peer transmission.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" id="feat3">
+                        <div class="feature-card p-4 text-center">
+                            <i class="bi bi-server feature-icon"></i>
+                            <h3 class="h5 fw-bold mt-3 text-cyan-300">ZERO
+                                SERVER STORAGE</h3>
+                            <p class="text-light-emphasis mt-2">No message
+                                history, no metadata. Our signaling only helps
+                                peers connect, nothing persists.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4" id="feat2">
-                    <div class="feature-card p-4 text-center">
-                        <i class="bi bi-lightning-charge-fill feature-icon"></i>
-                        <h3 class="h5 fw-bold mt-3 text-cyan-300">WEBRTC P2P</h3>
-                        <p class="text-light-emphasis mt-2">Direct, low-latency data channels. No server relays, no logs, pure peer-to-peer transmission.</p>
-                    </div>
-                </div>
-                <div class="col-md-4" id="feat3">
-                    <div class="feature-card p-4 text-center">
-                        <i class="bi bi-server feature-icon"></i>
-                        <h3 class="h5 fw-bold mt-3 text-cyan-300">ZERO SERVER STORAGE</h3>
-                        <p class="text-light-emphasis mt-2">No message history, no metadata. Our signaling only helps peers connect, nothing persists.</p>
-                    </div>
+                <div class="text-center mt-5">
+                    <div
+                        class="d-inline-block border-bottom border-cyan-400 pb-1 px-3 small text-light">🔒
+                        your privacy, our architecture 🔒</div>
                 </div>
             </div>
-            <div class="text-center mt-5">
-                <div class="d-inline-block border-bottom border-cyan-400 pb-1 px-3 small text-light">🔒 your privacy, our architecture 🔒</div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer py-4 text-center position-relative z-3">
+            <div class="container">
+                <p class="mb-1 small text-light"><i class="bi bi-dot"></i>
+                    GhostWire · absolute anonymity protocol <i
+                        class="bi bi-dot"></i></p>
+                <p class="mb-0 small text-light">© 2026 — No tracking, no
+                    telemetry. Open source spirit.</p>
             </div>
-        </div>
-    </section>
+        </footer>
 
-    <!-- Footer -->
-    <footer class="footer py-4 text-center position-relative z-3">
-        <div class="container">
-            <p class="mb-1 small text-light"><i class="bi bi-dot"></i> GhostWire · absolute anonymity protocol <i class="bi bi-dot"></i></p>
-            <p class="mb-0 small text-light">© 2026 — No tracking, no telemetry. Open source spirit.</p>
-        </div>
-    </footer>
+        <!-- Bootstrap JS Bundle -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
+        <script>
         // register GSAP ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
@@ -608,5 +667,5 @@
         
         console.log("%cGhostWire • encrypted P2P layer active — Hero card animation fixed & visible.", "color: #00e5ff; font-family: monospace; font-size: 12px");
     </script>
-</body>
+    </body>
 </html>
