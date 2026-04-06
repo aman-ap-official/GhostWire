@@ -433,17 +433,18 @@
 
         socket.on('call-incoming', (data) => {
             if (data.roomId === roomId) { // Ensure the call is for this specific room
+                addLog(`SECURE_CALL: Incoming ${data.callType.toUpperCase()} request...`);
+                addMessage('System', `Secure ${data.callType.toUpperCase()} link requested...`);
+                
                 // Ignore if we are the one who started the call
                 if (activeCallWindow && !activeCallWindow.closed) return;
-
+                
                 joinCallBtn.style.animation = 'neonBlink 1.2s infinite alternate ease-in-out';
                 if (data.callType === 'video') videoBtn.style.animation = 'neonBlink 0.8s infinite alternate ease-in-out';
                 else voiceBtn.style.animation = 'neonBlink 0.8s infinite alternate ease-in-out';
 
-                notificationText.textContent = `Incoming ${data.callType.toUpperCase()} call`;
+                notificationText.textContent = `Secure ${data.callType.toUpperCase()} link requested...`;
                 notificationBar.classList.remove('hidden');
-                addLog(`SECURE_CALL: Incoming ${data.callType.toUpperCase()} request...`);
-                addMessage('System', `Incoming secure ${data.callType.toUpperCase()} call transmission...`);
                 playAlert();
 
                 // Attempt automatic open (often blocked by browser, but works if user allowed popups)
@@ -468,6 +469,7 @@
         socket.on('call-ended', (data) => {
             if (data.roomId === roomId) {
                 stopBlinking();
+                addMessage('System', 'Call transmission terminated by peer.');
             }
         });
 

@@ -19,6 +19,16 @@ io.on('connection', (socket) => {
         });
     });
 
+    // Handle call initiation notification
+    socket.on('call-initiated', (data) => {
+        // Broadcast to everyone in the room except the caller
+        socket.to(data.roomId).emit('call-incoming', data);
+    });
+
+    socket.on('call-ended', (data) => {
+        socket.to(data.roomId).emit('call-ended', data);
+    });
+
     socket.on('signal', (data) => {
         // Forward WebRTC signals (offer, answer, candidates) to the specific peer
         io.to(data.to).emit('signal', {
