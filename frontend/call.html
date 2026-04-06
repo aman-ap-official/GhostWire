@@ -281,20 +281,37 @@
             <button class="btn-action" title="Share Screen">
                 <i class="bi bi-display"></i>
             </button>
-            <button class="btn-action btn-end" onclick="window.location.href='../index.html'">
+            <button class="btn-action btn-end" onclick="handleHangup()">
                 <i class="bi bi-telephone-x-fill"></i>
             </button>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         let localStream;
+        let peerConnection;
+        let pendingCandidates = [];
+        const socket = io();
         const urlParams = new URLSearchParams(window.location.search);
         const callType = urlParams.get('type') || 'video';
+        const roomId = urlParams.get('room');
 
-        // Initialize Local Video Stream
-        async function startCamera() {
+        const iceConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+        async function processPendingCandidates() {
+            for (const cand of pendingCandidates) {
+                try {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (e) {
+                    console.error("Error adding queued ICE candidate:", e);
+                }
+            }
+            pendingCandidates = [];
+        }
+
+        async function initCall() {
             try {
                 const constraints = { 
                     audio: true, 
@@ -302,6 +319,9 @@
                 };
                 localStream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('localStream').srcObject = localStream;
+
+                // Announce call initiation to the main room
+                socket.emit('call-initiated', { roomId: roomId, callType: callType, from: socket.id });
 
                 // Handle Initial Voice Mode UI
                 if (callType === 'voice') {
@@ -314,8 +334,89 @@
                     camBtn.classList.add('text-danger');
                     camBtn.querySelector('i').className = 'bi bi-camera-video-off-fill';
                 }
+
+                if (roomId) {
+                    // Join a separate sub-room for the call signaling
+                    socket.emit('join-room', roomId + '_call');
+
+                    socket.on('user-connected', (userId) => {
+                        createPeerConnection(userId, true);
+                    });
+
+                    // Handle the other user leaving the signaling room
+                    socket.on('user-disconnected', (userId) => {
+                        handleHangup();
+                    });
+
+                    socket.on('signal', async (data) => {
+                        if (!peerConnection) createPeerConnection(data.from, false);
+
+                        if (data.signal.type === 'offer') {
+                            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.signal));
+                            const answer = await peerConnection.createAnswer();
+                            await peerConnection.setLocalDescription(answer);
+                            socket.emit('signal', { to: data.from, signal: answer });
+                            await processPendingCandidates();
+                        } else if (data.signal.type === 'answer') {
+                            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.signal));
+                            await processPendingCandidates();
+                        } else if (data.signal.candidate) {
+                            if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
+                                await peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
+                            } else {
+                                pendingCandidates.push(data.signal.candidate);
+                            }
+                        }
+                    });
+                }
             } catch (err) {
                 console.error("Error accessing media devices.", err);
+            }
+        }
+
+        function createPeerConnection(userId, isInitiator) {
+            peerConnection = new RTCPeerConnection(iceConfig);
+            
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            peerConnection.ontrack = (event) => {
+                const remoteVideo = document.getElementById('remoteVideo');
+                if (remoteVideo.srcObject !== event.streams[0]) {
+                    remoteVideo.srcObject = event.streams[0];
+                    document.getElementById('remoteAvatar').classList.add('d-none');
+                    document.getElementById('remoteVideo').classList.remove('d-none');
+                }
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit('signal', { to: userId, signal: { candidate: event.candidate } });
+                }
+            };
+
+            if (isInitiator) {
+                peerConnection.createOffer().then(async (offer) => {
+                    await peerConnection.setLocalDescription(offer);
+                    socket.emit('signal', { to: userId, signal: offer });
+                });
+            }
+        }
+
+        function handleHangup() {
+            if (socket && roomId) {
+                socket.emit('call-ended', { roomId: roomId });
+            }
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            if (window.opener) {
+                window.close();
+            } else {
+                window.location.href = '../index.html';
             }
         }
 
@@ -353,7 +454,7 @@
 
         // Entry Animations
         document.addEventListener('DOMContentLoaded', () => {
-            startCamera();
+            initCall();
 
             const tl = gsap.timeline();
             tl.from(".hud-top", { y: -20, opacity: 0, duration: 0.8 })
